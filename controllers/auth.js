@@ -1,5 +1,6 @@
 const Patient = require('../models/patient')
 const Newsletter = require('../models/newsletter')
+const Demo = require('../models/demo')
 const nodemailer = require('nodemailer');
 const { google } = require("googleapis");
 const OAuth2 = google.auth.OAuth2;
@@ -275,6 +276,60 @@ exports.newsletter = (req,res) => {
     //     console.log("Record inserted successfully");
     // })
 } 
+
+exports.scheduleDemo = (req, res) => {
+    const { firstName, lastName, email, phone, person } = req.body;
+    //console.log(req.body.name,req.body.email, req.body.phone, req.body.message);
+    const oauth2Client = new OAuth2(
+        "173872994719-pvsnau5mbj47h0c6ea6ojrl7gjqq1908.apps.googleusercontent.com", // ClientID
+        "OKXIYR14wBB_zumf30EC__iJ", // Client Secret
+        "https://developers.google.com/oauthplayground" // Redirect URL
+    );
+    
+    oauth2Client.setCredentials({
+        refresh_token: "1//04T_nqlj9UVrVCgYIARAAGAQSNwF-L9IrGm-NOdEKBOakzMn1cbbCHgg2ivkad3Q_hMyBkSQen0b5ABfR8kPR18aOoqhRrSlPm9w"
+    });
+    const accessToken = oauth2Client.getAccessToken()
+    
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            type: "OAuth2",
+            user: "nodejsa@gmail.com",
+            clientId: "173872994719-pvsnau5mbj47h0c6ea6ojrl7gjqq1908.apps.googleusercontent.com",
+            clientSecret: "OKXIYR14wBB_zumf30EC__iJ",
+            refreshToken: "1//04T_nqlj9UVrVCgYIARAAGAQSNwF-L9IrGm-NOdEKBOakzMn1cbbCHgg2ivkad3Q_hMyBkSQen0b5ABfR8kPR18aOoqhRrSlPm9w",
+            accessToken: accessToken
+        },
+    });
+    
+    const mailOptions = {
+        from: '"Demo Mail" <nodejsa@gmail.com>', // sender address
+        to: 'kranthisai85@gmail.com', // list of receivers
+        subject: ""+req.body.firstName+" Wants to Schedule a demo", // Subject line
+        text: "First Name : "+req.body.firstName+".\nLast Name : "+req.body.lastName+".\nPhone : "+req.body.phone+".\nEmail : "+req.body.email+".\nPerson : "+req.body.person+".", // html body
+    };
+    
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error)
+        return res.json({error: "Failure"});
+        else 
+        console.log('Email sent: ' + info.response);
+        return res.json({result: "Success. Mail sent!"});
+    })
+    var data = {
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email,
+        "phone": phone,
+        "person": person
+    }
+    const demo = new Demo(data);
+    demo.save()
+    .then(result => res.json({"message" : "You sucessfully scheduled a demo, We will be contacting you in very short time."}))
+    .catch(err => res.json({"message" : "Please try again!!"}))
+ 
+}
 
 exports.signout = (req,res) => {
     res.clearCookie("t");

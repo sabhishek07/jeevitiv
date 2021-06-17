@@ -1,5 +1,5 @@
 const express = require('express');
-const { patientSignup, activatePatientAccount, gotoReset, forgotPassword, resetPassword, patientSignin, signout, needHelp, newsletter } = require('../controllers/auth');
+const { patientSignup, activatePatientAccount, gotoReset, forgotPassword, resetPassword, patientSignin, signout, needHelp, newsletter, scheduleDemo } = require('../controllers/auth');
 const router= express.Router();
 
 
@@ -10,7 +10,8 @@ router.post('/forgot', forgotPassword);
 router.get('/forgot/:token', gotoReset);
 router.post('/reset/:id', resetPassword);
 router.post('/needHelp', needHelp);
-router.post('/newsletter', newsletter)
+router.post('/newsletter', newsletter);
+router.post('/scheduleDemo', scheduleDemo);
 
 // router.post('/doctorSignup', doctorSignup);
 // router.post('/doctorSignin',  doctorSignin);
